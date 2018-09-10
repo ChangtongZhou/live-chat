@@ -6,16 +6,35 @@ import {loginBroadCast, sendChatSocket, changeNameSocket, changeRoomSocket, Send
 import socketIOClient from "socket.io-client";
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import {TextField, Paper, Divider, Typography, Button} from '@material-ui/core';
+import {TextField, Grid, Paper, Divider, Typography, List, ListItem, ListItemIcon, ListItemText, Button} from '@material-ui/core';
+import StarIcon from '@material-ui/icons/Star';
 
 const styles = theme => ({
+    root: {
+        flexGrow: 1,
+        position: 'relative',
+        overflow: 'auto',
+        maxHeight: 600
+    },
+    paper: {
+        padding: theme.spacing.unit * 2,
+        textAlign: 'center',
+        backgroundColor: "#2196f3",
+    },
+    subtitlePaper: {
+        padding: theme.spacing.unit * 2
+    },
+    msgBoard: {
+        height: 500,
+        padding: theme.spacing.unit * 2
+    },
     bootstrapInput: {
         borderRadius: 4,
         backgroundColor: theme.palette.common.white,
         border: '1px solid #ced4da',
         fontSize: 16,
         padding: '10px 12px',
-        width: '380px',
+        width: '1750px',
         transition: theme.transitions.create(['border-color', 'box-shadow']),
         '&:focus': {
           borderColor: '#80bdff',
@@ -24,6 +43,9 @@ const styles = theme => ({
       },
       bootstrapFormLabel: {
         fontSize: 18,
+      },
+      list: {
+        backgroundColor: "#EEEEEE"
       },
       button: {
         margin: theme.spacing.unit,
@@ -127,70 +149,105 @@ class App extends Component {
 
     render() {
         const {classes, chatRoom, msgs} = this.props;
-        console.log(`Props in app component: ${JSON.stringify(this.props, null, 2)}`);
-        // console.log(`this.state: ${JSON.stringify(chatRoom, null, 2)}`)
-        // console.log(`this.props.chatRoom: ${JSON.stringify(this.props.chatRoom, null, 2)}`)
-
         return (
             <Fragment>
-                <h1>{chatRoom.room}</h1>
-                
-                {/* { chatRoom &&
-                    <div>
-                        <p>You are known as {chatRoom.user}</p> 
-                    </div>
+               <Grid container spacing={24}>
+                    {/* Display room */}
+                    <Grid item xs={12}>
+                        <Paper className={classes.paper}>
+                            <Typography variant="display1" style={{color: "white"}}>{chatRoom.room}</Typography>
+                        </Paper>
                         
-                } */}
+                        
+                    </Grid>
 
+                    {/* Display users in the room */}
+                    <Grid item xm={12} sm={10}>
+                        <div className = {classes.subtitlePaper}>
+                            { msgs.users && 
+                                <Typography variant="subheading" >{msgs.users}</Typography>
+                            }
+                        </div>
 
-                { msgs.users && 
-                    <div>
-                        <p>{msgs.users}</p>
-                    </div> 
-                }
+                        {/* Display message/dialogs */}
+                        <div className={classes.root}>
+                            <List className={classes.list}>                   
+                            { 
+                                msgs.chatMsg.map((msg, idx) => (
+                                    <ListItem key={idx} className={classes.listItem}>
+                                        <ListItemText primary={msg}></ListItemText>
+                                    </ListItem>
+                                ))
 
-                <div style={{border: "1px solid black"}}>
-                    { 
-                        msgs.chatMsg.map((msg, idx) => {
-                            return <p id={idx}>{msg}</p>
-                        })
-
-                    }
-                </div>
-                
-
-                    {/* <p>Users currently in {chatRoom.room}: {chatRoom.users}</p> */}
-                   
+                            }
+                            </List>
+                        </div>
+                    </Grid>
                     
-                
-                <p>rooms: {msgs.rooms}</p>
+                    {/* Display rooms */}
+                    <Grid item xs={12} sm={2}>
+                        <List>                   
+                            { 
+                                msgs.rooms && msgs.rooms.map((room, idx) => (
+                                    <ListItem key={idx} className={classes.listItem}>
+                                        <ListItemText primary={room}></ListItemText>
+                                    </ListItem>
+                                ))
 
-                <Divider />
+                            }
+                        </List>
+                    </Grid>
 
-                {/* Input form */}
-                <div style={{margin: '25px'}}>
-                    <TextField
-                        placeholder="Send Message"
-                        id="bootstrap-input"
-                        value = {this.state.input}
-                        onChange={this.handleInput}
-                        InputProps={{
-                        disableUnderline: true,
-                        classes: {
-                            root: classes.bootstrapRoot,
-                            input: classes.bootstrapInput,
-                        },
-                        }}
-                        InputLabelProps={{
-                        shrink: true,
-                        className: classes.bootstrapFormLabel,
-                        }}
-                    />
 
-                    <Button variant="contained" color="primary" aria-label="Add" className={classes.button} onClick={this.handleSubmit}>
-                        Send
-                    </Button>
-                </div>
+                    <Divider />
+
+                    {/* Input form */}
+                    <div style={{margin: '25px'}}>
+                        <TextField
+                            placeholder="Send Message"
+                            id="bootstrap-input"
+                            value = {this.state.input}
+                            onChange={this.handleInput}
+                            InputProps={{
+                            disableUnderline: true,
+                            classes: {
+                                root: classes.bootstrapRoot,
+                                input: classes.bootstrapInput,
+                            },
+                            }}
+                            InputLabelProps={{
+                            shrink: true,
+                            className: classes.bootstrapFormLabel,
+                            }}
+                        />
+
+                        <Button variant="contained" color="primary" aria-label="Add" className={classes.button} onClick={this.handleSubmit}>
+                            Send
+                        </Button>
+                    </div>
+                    
+                    {/* Command Menu */}
+                    <div className = {classes.subtitlePaper}>
+                        <Typography variant="subheading" style={{color: "gray", paddingLeft: "10px"}}>Chat Commands: </Typography>
+                        <List>     
+
+                            <ListItem className={classes.listItem}>
+                                <ListItemIcon>
+                                    <StarIcon />
+                                </ListItemIcon>
+                                <ListItemText secondary="Change nickname: /nick [user name]"></ListItemText>
+                            </ListItem>
+                            <ListItem className={classes.listItem}>
+                                <ListItemIcon>
+                                    <StarIcon />
+                                </ListItemIcon>
+                                <ListItemText secondary="Join/Create room: /join [room name]"></ListItemText>
+                            </ListItem>
+                        </List>
+                    </div>
+
+                    
+                </Grid>
             </Fragment>
             
         )

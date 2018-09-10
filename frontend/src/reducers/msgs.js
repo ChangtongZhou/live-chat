@@ -1,6 +1,3 @@
-// let initialState = new Map();
-// initialState.set("Lobby", []);
-
 const msgs = (state = {users: null, chatMsg: []}, action) => {
     switch (action.type) {
         case 'LOGIN_BROADCAST':
